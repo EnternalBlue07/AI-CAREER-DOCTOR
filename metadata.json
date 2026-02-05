@@ -1,0 +1,5 @@
+{
+  "name": "AI Career Doctor",
+  "description": "An enterprise-grade AI application that parses resumes, calculates ATS scores, identifies skill gaps, and generates a 90-day actionable career roadmap using Gemini 3 Flash.",
+  "requestFramePermissions": []
+}
