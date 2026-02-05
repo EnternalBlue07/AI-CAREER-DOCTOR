@@ -8,6 +8,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/11B9fjbym-TN7K-4TnrZ5Mk
 
 **Prerequisites:**  Node.js
 
+<img width="1403" height="838" alt="image" src="https://github.com/user-attachments/assets/219f03a4-de34-4834-aa62-2307a7a75fc5" />
 
 1. Install dependencies:
    `npm install`
