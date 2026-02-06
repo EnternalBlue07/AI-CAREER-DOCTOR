@@ -31,7 +31,15 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onContinue }) => {
         try {
             // Dynamic import to ensure it uses the importmap version
             // @ts-ignore
-            const pdfjsLib = await import('pdfjs-dist');
+            const pdfjsModule = await import('pdfjs-dist');
+            
+            // Handle different module structures (default export vs named exports)
+            const pdfjsLib = pdfjsModule.GlobalWorkerOptions ? pdfjsModule : pdfjsModule.default;
+            
+            if (!pdfjsLib || !pdfjsLib.GlobalWorkerOptions) {
+                 throw new Error("Unable to initialize PDF parser. Please try copy-pasting text instead.");
+            }
+
             // Set worker using a reliable CDN
             pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 

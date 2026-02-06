@@ -31,6 +31,9 @@ export interface AnalysisResult {
     experience: number;
     projects: number;
     formatting: number;
+    formattingIssues: string[];
+    keywordDensity: "Low" | "Optimal" | "Excessive";
+    actionVerbs: "Weak" | "Moderate" | "Strong";
   };
   missingSkills: {
     skill: string;
@@ -49,6 +52,12 @@ export interface AnalysisResult {
   }[];
   roadmap: RoadmapWeek[];
   summary: string;
+  jdAnalysis?: {
+    matchScore: number;
+    missingKeywords: string[];
+    matchingKeywords: string[];
+    summary: string;
+  };
 }
 
 export interface UserConfig {
@@ -56,4 +65,16 @@ export interface UserConfig {
   resumeText: string;
   targetRole: TargetRole;
   experienceYears: number;
+  jobDescription: string;
+}
+
+export interface InterviewQuestion {
+  question: string;
+  type: "Behavioral" | "Technical";
+  expectedAnswerKey: string;
+}
+
+export interface FixedResumeResult {
+  markdown: string;
+  improvements: string[];
 }

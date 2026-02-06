@@ -4,7 +4,7 @@ import ResumeUploader from './components/ResumeUploader';
 import AnalysisLoader from './components/AnalysisLoader';
 import Dashboard from './components/Dashboard';
 import { analyzeResume } from './services/geminiService';
-import { Briefcase, ArrowRight, UserCircle, Settings } from 'lucide-react';
+import { Briefcase, ArrowRight, UserCircle, Settings, FileText } from 'lucide-react';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<AppStep>(AppStep.LANDING);
@@ -12,7 +12,8 @@ const App: React.FC = () => {
     name: 'Candidate',
     resumeText: '',
     targetRole: TargetRole.BACKEND_DEV,
-    experienceYears: 2
+    experienceYears: 2,
+    jobDescription: ''
   });
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
@@ -28,8 +29,12 @@ const App: React.FC = () => {
     setStep(AppStep.PROCESSING);
     setLoadingError(null);
     try {
-      // Pass the actual resume text and user config to Gemini
-      const data = await analyzeResume(config.resumeText, config.targetRole, config.experienceYears);
+      const data = await analyzeResume(
+          config.resumeText, 
+          config.targetRole, 
+          config.experienceYears,
+          config.jobDescription
+      );
       setResult(data);
     } catch (err) {
       console.error(err);
@@ -78,35 +83,49 @@ const App: React.FC = () => {
       </div>
 
       <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Target Role</label>
-          <select 
-            value={config.targetRole}
-            onChange={(e) => setConfig({...config, targetRole: e.target.value as TargetRole})}
-            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-500 outline-none"
-          >
-            {Object.values(TargetRole).map(role => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Target Role</label>
+            <select 
+                value={config.targetRole}
+                onChange={(e) => setConfig({...config, targetRole: e.target.value as TargetRole})}
+                className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-500 outline-none"
+            >
+                {Object.values(TargetRole).map(role => (
+                <option key={role} value={role}>{role}</option>
+                ))}
+            </select>
+            </div>
+
+            <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Years of Experience: {config.experienceYears}</label>
+            <input 
+                type="range" 
+                min="0" 
+                max="15" 
+                step="1"
+                value={config.experienceYears}
+                onChange={(e) => setConfig({...config, experienceYears: parseInt(e.target.value)})}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+            />
+            <div className="flex justify-between text-xs text-slate-400 mt-2">
+                <span>Fresher (0)</span>
+                <span>Mid (5)</span>
+                <span>Expert (15+)</span>
+            </div>
+            </div>
         </div>
 
         <div>
-           <label className="block text-sm font-medium text-slate-700 mb-2">Years of Experience: {config.experienceYears}</label>
-           <input 
-              type="range" 
-              min="0" 
-              max="15" 
-              step="1"
-              value={config.experienceYears}
-              onChange={(e) => setConfig({...config, experienceYears: parseInt(e.target.value)})}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
-           />
-           <div className="flex justify-between text-xs text-slate-400 mt-2">
-             <span>Fresher (0)</span>
-             <span>Mid (5)</span>
-             <span>Expert (15+)</span>
-           </div>
+            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                <FileText size={16} /> Target Job Description (Optional)
+            </label>
+            <textarea 
+                className="w-full h-32 p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-500 outline-none text-sm"
+                placeholder="Paste a Job Description here to get a specific match analysis..."
+                value={config.jobDescription}
+                onChange={(e) => setConfig({...config, jobDescription: e.target.value})}
+            />
         </div>
         
         {loadingError && (
@@ -175,7 +194,11 @@ const App: React.FC = () => {
             )}
 
             {step === AppStep.DASHBOARD && result && (
-              <Dashboard data={result} />
+              <Dashboard 
+                data={result} 
+                userResume={config.resumeText} 
+                targetRole={config.targetRole}
+              />
             )}
           </main>
         </>
